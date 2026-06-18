@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8BitBeatBox — NES / SNES Chiptune Maker</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="logo">8BIT</span><span class="logo alt">BEATBOX</span>
+    </div>
+
+    <div class="transport">
+      <button id="btn-play" class="btn primary">▶ Play</button>
+      <button id="btn-stop" class="btn">■</button>
+      <label class="ctl">Mode
+        <select id="mode">
+          <option value="pattern">Loop</option>
+          <option value="song">Song</option>
+        </select>
+      </label>
+      <label class="ctl">BPM <input id="bpm" type="number" min="20" max="400" value="120"></label>
+      <label class="ctl vol">Vol <input id="master" type="range" min="0" max="1" step="0.01" value="0.8"></label>
+    </div>
+
+    <div class="file-ops">
+      <input id="title" class="song-title" type="text" value="Untitled Chiptune" spellcheck="false">
+      <button id="btn-undo" class="btn icon" title="Undo (Ctrl+Z)">↶</button>
+      <button id="btn-redo" class="btn icon" title="Redo (Ctrl+Y)">↷</button>
+      <button id="btn-save" class="btn ghost" title="Save to your song library">Save</button>
+      <button id="btn-songs" class="btn accent" title="Demos &amp; your saved songs">☰ Songs</button>
+      <button id="btn-export" class="btn ghost" title="Render to WAV">Export WAV</button>
+      <input id="file-input" type="file" accept=".json,.8bb,application/json" hidden>
+    </div>
+  </header>
+
+  <div id="workspace">
+    <!-- Channel rack -->
+    <aside id="rack-panel">
+      <div class="panel-head">CHANNELS</div>
+      <div id="channel-rack"></div>
+      <div class="rack-hint">Click a channel to edit it.<br>Drag across the grid to paint runs &amp; rolling scales.</div>
+    </aside>
+
+    <!-- Editor -->
+    <main id="editor">
+      <div id="roll-toolbar">
+        <div class="tool-group">
+          <span class="tool-label">PATTERNS</span>
+          <div id="pattern-list"></div>
+          <button id="btn-add-pattern" class="btn tiny" title="New empty pattern">＋</button>
+          <button id="btn-dup-pattern" class="btn tiny" title="Duplicate current pattern">⧉</button>
+          <button id="btn-clear-pattern" class="btn tiny" title="Clear pattern">⌫</button>
+          <button id="btn-del-pattern" class="btn tiny danger" title="Delete pattern">✕</button>
+        </div>
+        <div class="tool-group right">
+          <label class="ctl">Key
+            <select id="key">
+              <option value="0">C</option><option value="1">C#</option><option value="2">D</option>
+              <option value="3">D#</option><option value="4">E</option><option value="5">F</option>
+              <option value="6">F#</option><option value="7">G</option><option value="8">G#</option>
+              <option value="9">A</option><option value="10">A#</option><option value="11">B</option>
+            </select>
+          </label>
+          <label class="ctl">Scale
+            <select id="scale">
+              <option value="chromatic">Chromatic</option>
+              <option value="major">Major</option>
+              <option value="minor">Minor</option>
+              <option value="harmonicMinor">Harm. Minor</option>
+              <option value="dorian">Dorian</option>
+              <option value="phrygian">Phrygian</option>
+              <option value="mixolydian">Mixolydian</option>
+              <option value="pentatonicMajor">Maj Penta</option>
+              <option value="pentatonicMinor">Min Penta</option>
+              <option value="blues">Blues</option>
+            </select>
+          </label>
+          <label class="ctl">Note
+            <select id="notelen" title="Length of notes you draw">
+              <option value="1">1/16</option>
+              <option value="2" selected>1/8</option>
+              <option value="4">1/4</option>
+              <option value="8">1/2</option>
+              <option value="16">whole</option>
+            </select>
+          </label>
+          <label class="ctl">Grid
+            <select id="grid">
+              <option value="2">1/8</option>
+              <option value="3">1/8T</option>
+              <option value="4" selected>1/16</option>
+              <option value="6">1/16T</option>
+              <option value="8">1/32</option>
+            </select>
+          </label>
+          <label class="ctl">Beats
+            <select id="beats">
+              <option value="2">2</option><option value="3">3</option>
+              <option value="4" selected>4</option><option value="5">5</option>
+              <option value="6">6</option><option value="7">7</option>
+            </select>
+          </label>
+          <label class="ctl">Bars <input id="bars" type="number" min="1" max="16" value="2"></label>
+          <label class="ctl check"><input id="snap" type="checkbox" checked> Snap</label>
+          <label class="ctl">Zoom <input id="zoom" type="range" min="14" max="56" step="2" value="26"></label>
+        </div>
+      </div>
+
+      <div id="roll-wrap">
+        <canvas id="roll"></canvas>
+      </div>
+
+      <div id="arrangement">
+        <span class="tool-label">SONG</span>
+        <div id="sequence-list"></div>
+      </div>
+    </main>
+  </div>
+
+  <footer id="statusbar">
+    <span><b style="color:var(--cyan)">Draw:</b> click or drag to paint notes</span>
+    <span class="sep">·</span>
+    <span><b style="color:var(--magenta)">Move:</b> drag a note · <b style="color:var(--magenta)">Length:</b> drag its right edge</span>
+    <span class="sep">·</span>
+    <span><b style="color:var(--gold)">Erase:</b> right-drag / alt-click</span>
+    <span class="sep">·</span>
+    <span><span class="kbd">Space</span> play <span class="kbd">Ctrl+Z</span> undo</span>
+  </footer>
+
+  <!-- Songs browser (demos + your saved songs) -->
+  <div id="modal-overlay" hidden>
+    <div id="song-modal" role="dialog" aria-label="Songs">
+      <div class="modal-head">
+        <span class="modal-title">♫ SONGS</span>
+        <button id="modal-close" class="btn icon" title="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <section class="modal-section">
+          <h4>Start fresh</h4>
+          <div class="modal-actions">
+            <button id="btn-new" class="btn">＋ Blank Song</button>
+            <button id="btn-import" class="btn">⤓ Import .json…</button>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h4>Demo Songs</h4>
+          <div id="demo-list" class="card-grid"></div>
+        </section>
+        <section class="modal-section">
+          <h4>My Saved Songs <span id="lib-count" class="muted"></span></h4>
+          <div id="library-list" class="card-grid"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/synth.js"></script>
+  <script src="js/song.js"></script>
+  <script src="js/library.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/sequencer.js"></script>
+  <script src="js/pianoroll.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

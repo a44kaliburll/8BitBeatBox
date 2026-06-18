@@ -1,0 +1,11 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / temp
+*.log
+*.tmp
+
+# Local Claude overrides (launch.json is kept on purpose)
+.claude/settings.local.json
