@@ -24,7 +24,10 @@ jobs:
         run: npm install
 
       - name: Build installer
-        run: npm run dist
+        # --publish never: just build the artifacts; the release step below
+        # (softprops/action-gh-release) handles attaching them, so electron-builder
+        # doesn't need its own GH_TOKEN to auto-publish.
+        run: npx electron-builder --win --publish never
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
