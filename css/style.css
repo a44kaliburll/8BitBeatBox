@@ -274,14 +274,14 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 15px; height: 15px; }
 #statusbar .sep { opacity: .4; }
 
 /* ===========================  SONGS MODAL  =========================== */
-#modal-overlay {
+#modal-overlay, .overlay {
   position: fixed; inset: 0; z-index: 50;
   background: rgba(5, 4, 12, 0.72);
   backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center;
 }
-#modal-overlay[hidden] { display: none; }
-#song-modal {
+#modal-overlay[hidden], .overlay[hidden] { display: none; }
+#song-modal, .modal-box {
   width: min(760px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column;
   background: linear-gradient(180deg, #181233, #0f0b22);
@@ -328,6 +328,27 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 15px; height: 15px; }
 }
 .btn.ok { border-color: var(--lime); color: var(--lime); }
 .empty-note { color: var(--dim); font-style: italic; font-size: 12px; padding: 8px 0; }
+.section-hint { margin: 10px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--dim); }
+.section-hint b { color: var(--txt); }
+.section-hint a { color: var(--cyan); text-decoration: none; }
+.section-hint a:hover { text-decoration: underline; }
+
+/* ---- 8-bit FX modal ---- */
+.preset-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.fx-preset.active {
+  background: linear-gradient(90deg, rgba(58,214,255,0.28), rgba(255,95,210,0.28));
+  border-color: var(--cyan); color: #fff;
+}
+.fx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 20px; }
+.fx-grid label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--dim);
+}
+.fx-grid label b { color: var(--cyan); font-family: var(--font-mono); font-size: 15px; text-transform: none; letter-spacing: 0; }
+.fx-grid input[type="range"] { width: 100%; }
+.fx-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
+#fx-status { font-style: italic; }
+#fx-filename { font-style: italic; }
 
 /* scrollbars */
 ::-webkit-scrollbar { width: 12px; height: 12px; }

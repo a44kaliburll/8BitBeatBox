@@ -17,6 +17,14 @@
   var AUTOSAVE_KEY = 'bbb_autosave_v1';
   var HISTORY_CAP = 80;
 
+  // 8-bit FX presets: bits, rate(kHz), lp(kHz), drive, rev(%), mix(%)
+  var FX_PRESETS = {
+    snes: { bits: 13, rate: 32, lp: 11, drive: 1.1, rev: 20, mix: 100 },
+    nes: { bits: 7, rate: 15, lp: 7, drive: 1.3, rev: 0, mix: 100 },
+    gb: { bits: 4, rate: 8, lp: 6, drive: 1.4, rev: 0, mix: 100 },
+    lofi: { bits: 10, rate: 22, lp: 8, drive: 1.1, rev: 25, mix: 90 }
+  };
+
   var App = {
     song: null,
     currentPatternIndex: 0,
@@ -44,6 +52,7 @@
       Sequencer.init(this);
 
       this._wireControls();
+      this._wireFx();
       this._syncControlsFromSong();
       UI.renderAll();
       PianoRoll.refresh();
@@ -152,12 +161,14 @@
       on('btn-new', 'click', function () { self.loadSongChecked(Song.createDefaultSong()); });
       on('btn-import', 'click', function () { document.getElementById('file-input').click(); });
       on('file-input', 'change', function (e) { self._loadFile(e.target.files[0]); e.target.value = ''; });
+      on('btn-import-midi', 'click', function () { document.getElementById('midi-input').click(); });
+      on('midi-input', 'change', function (e) { self._loadMidi(e.target.files[0]); e.target.value = ''; });
       on('btn-save', 'click', function () { self._saveToLibrary(); });
       on('btn-export', 'click', function () { self._exportWav(); });
 
       window.addEventListener('keydown', function (e) {
         var typing = /input|select|textarea/i.test(document.activeElement.tagName);
-        if (e.key === 'Escape') { UI.closeLibrary(); return; }
+        if (e.key === 'Escape') { UI.closeLibrary(); if (self._closeFx) self._closeFx(); return; }
         if (e.code === 'Space' && !typing) { e.preventDefault(); self._togglePlay(); return; }
         if ((e.ctrlKey || e.metaKey) && !typing) {
           if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); self.undo(); }
@@ -188,6 +199,88 @@
     downloadData: function (data, name) {
       this._download(new Blob([data], { type: 'application/json' }),
         (name || 'chiptune').replace(/[^a-z0-9_-]+/gi, '_') + '.8bb.json');
+    },
+
+    // ---- 8-bit / 16-bit audio FX ----
+    _wireFx: function () {
+      var self = this;
+      var Crusher = global.BBB.Crusher;
+      function $(id) { return document.getElementById(id); }
+      function open() { self._refreshFxLabels(); $('fx-overlay').hidden = false; }
+      function close() { Crusher.stop(); $('fx-overlay').hidden = true; }
+      self._closeFx = close;
+
+      $('btn-fx').addEventListener('click', open);
+      $('fx-close').addEventListener('click', close);
+      $('fx-overlay').addEventListener('click', function (e) { if (e.target.id === 'fx-overlay') close(); });
+      $('fx-choose').addEventListener('click', function () { $('fx-file').click(); });
+
+      $('fx-file').addEventListener('change', function (e) {
+        var f = e.target.files[0]; if (!f) return;
+        $('fx-status').textContent = '';
+        $('fx-filename').textContent = 'Loading…';
+        Crusher.load(f).then(function (buf) {
+          $('fx-filename').textContent = f.name + '  (' + buf.duration.toFixed(1) + 's)';
+        }).catch(function (err) { $('fx-filename').textContent = 'Could not load: ' + err.message; });
+        e.target.value = '';
+      });
+
+      ['bits', 'rate', 'lp', 'drive', 'rev', 'mix'].forEach(function (k) {
+        var el = $('fx-' + k);
+        if (el) el.addEventListener('input', function () {
+          self._refreshFxLabels();
+          // a manual tweak no longer matches a named preset
+          Array.prototype.forEach.call(document.querySelectorAll('.fx-preset'), function (b) { b.classList.remove('active'); });
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll('.fx-preset'), function (btn) {
+        btn.addEventListener('click', function () {
+          var p = FX_PRESETS[btn.getAttribute('data-preset')]; if (!p) return;
+          $('fx-bits').value = p.bits; $('fx-rate').value = p.rate; $('fx-lp').value = p.lp;
+          $('fx-drive').value = p.drive; $('fx-rev').value = p.rev; $('fx-mix').value = p.mix;
+          Array.prototype.forEach.call(document.querySelectorAll('.fx-preset'), function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          self._refreshFxLabels();
+        });
+      });
+
+      $('fx-play').addEventListener('click', function () {
+        if (!Crusher.buffer) { $('fx-status').textContent = 'Load a file first.'; return; }
+        $('fx-status').textContent = 'Processing…';
+        Crusher.process(self._fxOpts()).then(function (buf) {
+          Crusher.play(buf); $('fx-status').textContent = '▶ Playing…';
+        }).catch(function (err) { $('fx-status').textContent = 'Error: ' + err.message; });
+      });
+      Crusher.onEnded = function () {
+        var s = $('fx-status'); if (s && s.textContent.indexOf('Playing') >= 0) s.textContent = 'Done.';
+      };
+      $('fx-stop').addEventListener('click', function () { Crusher.stop(); $('fx-status').textContent = 'Stopped.'; });
+
+      $('fx-export').addEventListener('click', function () {
+        if (!Crusher.buffer) { $('fx-status').textContent = 'Load a file first.'; return; }
+        $('fx-status').textContent = 'Rendering…';
+        Crusher.process(self._fxOpts()).then(function (buf) {
+          var blob = Sequencer.encodeWav(buf);
+          var base = (Crusher.fileName || 'audio').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_');
+          self._download(blob, base + '_8bit.wav');
+          $('fx-status').textContent = 'Exported ✓';
+        }).catch(function (err) { $('fx-status').textContent = 'Export failed: ' + err.message; });
+      });
+    },
+
+    _fxOpts: function () {
+      function v(id) { return parseFloat(document.getElementById(id).value); }
+      return { bits: v('fx-bits'), rate: v('fx-rate'), lp: v('fx-lp'), drive: v('fx-drive'), reverb: v('fx-rev') / 100, mix: v('fx-mix') / 100 };
+    },
+    _refreshFxLabels: function () {
+      function set(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
+      set('fx-bits-v', document.getElementById('fx-bits').value);
+      set('fx-rate-v', document.getElementById('fx-rate').value);
+      set('fx-lp-v', document.getElementById('fx-lp').value);
+      set('fx-drive-v', parseFloat(document.getElementById('fx-drive').value).toFixed(1));
+      set('fx-rev-v', document.getElementById('fx-rev').value);
+      set('fx-mix-v', document.getElementById('fx-mix').value);
     },
 
     _confirmReplace: function () {
@@ -243,6 +336,19 @@
         catch (err) { alert('Could not load file: ' + err.message); }
       };
       reader.readAsText(file);
+    },
+
+    _loadMidi: function (file) {
+      if (!file) return;
+      var self = this, reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var parsed = global.BBB.Midi.parse(reader.result);
+          var song = global.BBB.Midi.toSong(parsed, { title: file.name.replace(/\.midi?$/i, '') });
+          self.loadSongChecked(song);
+        } catch (err) { alert('MIDI import failed: ' + err.message); }
+      };
+      reader.readAsArrayBuffer(file);
     },
     _exportWav: function () {
       var self = this, btn = document.getElementById('btn-export');

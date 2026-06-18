@@ -225,5 +225,6 @@
     return new Blob([ab], { type: 'audio/wav' });
   }
 
+  Sequencer.encodeWav = encodeWav; // shared with the audio FX exporter
   global.BBB.Sequencer = Sequencer;
 })(window);

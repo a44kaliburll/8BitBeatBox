@@ -9,3 +9,8 @@ desktop.ini
 
 # Local Claude overrides (launch.json is kept on purpose)
 .claude/settings.local.json
+
+# Node / Electron build artifacts
+node_modules/
+dist/
+build/_icon_preview.png

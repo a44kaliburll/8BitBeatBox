@@ -33,7 +33,8 @@
       <button id="btn-redo" class="btn icon" title="Redo (Ctrl+Y)">↷</button>
       <button id="btn-save" class="btn ghost" title="Save to your song library">Save</button>
       <button id="btn-songs" class="btn accent" title="Demos &amp; your saved songs">☰ Songs</button>
-      <button id="btn-export" class="btn ghost" title="Render to WAV">Export WAV</button>
+      <button id="btn-fx" class="btn ghost" title="Crush a WAV/MP3 to 8-bit / 16-bit">🎛 8-Bit FX</button>
+      <button id="btn-export" class="btn ghost" title="Render the song to WAV">Export WAV</button>
       <input id="file-input" type="file" accept=".json,.8bb,application/json" hidden>
     </div>
   </header>
@@ -144,8 +145,10 @@
           <h4>Start fresh</h4>
           <div class="modal-actions">
             <button id="btn-new" class="btn">＋ Blank Song</button>
+            <button id="btn-import-midi" class="btn accent">🎹 Convert a MIDI…</button>
             <button id="btn-import" class="btn">⤓ Import .json…</button>
           </div>
+          <p class="section-hint">Drop in a <b>.mid</b> file and it becomes an editable chiptune — tracks are auto-mapped to NES/SNES instruments. (Got a WAV? See the note below to turn it into MIDI first.)</p>
         </section>
         <section class="modal-section">
           <h4>Demo Songs</h4>
@@ -155,6 +158,70 @@
           <h4>My Saved Songs <span id="lib-count" class="muted"></span></h4>
           <div id="library-list" class="card-grid"></div>
         </section>
+        <section class="modal-section">
+          <h4>Turning a WAV / MP3 into 8-bit</h4>
+          <p class="section-hint">A recording (WAV/MP3) has no note data, so first convert it to MIDI with a free
+            audio-to-MIDI tool — <a href="https://basicpitch.spotify.com/" target="_blank" rel="noopener">Spotify basic-pitch</a>
+            works in the browser. Then use <b>Convert a MIDI</b> above. Simple melodies/leads convert best; busy mixes need cleanup.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+  <input id="midi-input" type="file" accept=".mid,.midi" hidden>
+
+  <!-- 8-bit / 16-bit audio FX (bitcrusher) -->
+  <div id="fx-overlay" class="overlay" hidden>
+    <div class="modal-box" role="dialog" aria-label="8-bit FX">
+      <div class="modal-head">
+        <span class="modal-title">🎛 8-BIT / 16-BIT FX</span>
+        <button id="fx-close" class="btn icon" title="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <section class="modal-section">
+          <h4>1 · Load a recording</h4>
+          <div class="modal-actions">
+            <button id="fx-choose" class="btn accent">⤓ Choose WAV / MP3…</button>
+            <span id="fx-filename" class="muted">No file loaded</span>
+          </div>
+          <input id="fx-file" type="file" accept="audio/*,.wav,.mp3,.ogg,.m4a" hidden>
+          <p class="section-hint">Your whole song stays intact — this makes the <i>recording</i> sound like it's
+            playing on old hardware (it doesn't re-play it on chips).</p>
+        </section>
+
+        <section class="modal-section">
+          <h4>2 · Console preset</h4>
+          <div class="preset-row">
+            <button class="fx-preset btn" data-preset="snes">SNES · 16-bit</button>
+            <button class="fx-preset btn" data-preset="nes">NES · 8-bit</button>
+            <button class="fx-preset btn" data-preset="gb">Game Boy · 4-bit</button>
+            <button class="fx-preset btn" data-preset="lofi">Lo-Fi</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>3 · Fine tune</h4>
+          <div class="fx-grid">
+            <label>Bit depth <b><span id="fx-bits-v">13</span>-bit</b>
+              <input id="fx-bits" type="range" min="2" max="16" step="1" value="13"></label>
+            <label>Sample rate <b><span id="fx-rate-v">32</span> kHz</b>
+              <input id="fx-rate" type="range" min="4" max="44" step="1" value="32"></label>
+            <label>Tone — low-pass <b><span id="fx-lp-v">11</span> kHz</b>
+              <input id="fx-lp" type="range" min="1" max="20" step="1" value="11"></label>
+            <label>Drive <b><span id="fx-drive-v">1.1</span>×</b>
+              <input id="fx-drive" type="range" min="1" max="5" step="0.1" value="1.1"></label>
+            <label>Reverb <b><span id="fx-rev-v">20</span>%</b>
+              <input id="fx-rev" type="range" min="0" max="100" step="1" value="20"></label>
+            <label>Mix <b><span id="fx-mix-v">100</span>%</b>
+              <input id="fx-mix" type="range" min="0" max="100" step="1" value="100"></label>
+          </div>
+        </section>
+
+        <section class="modal-section fx-actions">
+          <button id="fx-play" class="btn primary">▶ Preview</button>
+          <button id="fx-stop" class="btn">■ Stop</button>
+          <button id="fx-export" class="btn accent">⤒ Export WAV</button>
+          <span id="fx-status" class="muted"></span>
+        </section>
       </div>
     </div>
   </div>
@@ -162,9 +229,11 @@
   <script src="js/synth.js"></script>
   <script src="js/song.js"></script>
   <script src="js/library.js"></script>
+  <script src="js/midi.js"></script>
   <script src="js/demo.js"></script>
   <script src="js/sequencer.js"></script>
   <script src="js/pianoroll.js"></script>
+  <script src="js/crusher.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
 </body>

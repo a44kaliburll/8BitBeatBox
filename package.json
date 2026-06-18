@@ -1,0 +1,49 @@
+{
+  "name": "8bitbeatbox",
+  "productName": "8BitBeatBox",
+  "version": "1.0.0",
+  "description": "A NES / SNES-era chiptune maker — piano-roll tracker, authentic 8-bit synth, demos, MIDI import and an 8-bit/16-bit audio FX bitcrusher.",
+  "author": "a44kaliburll <joshuamparkinson@gmail.com>",
+  "license": "MIT",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^31.7.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.a44kaliburll.8bitbeatbox",
+    "productName": "8BitBeatBox",
+    "copyright": "Copyright © 2026 a44kaliburll",
+    "directories": { "output": "dist" },
+    "files": [
+      "index.html",
+      "electron-main.js",
+      "css/**/*",
+      "js/**/*"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "8BitBeatBox",
+      "uninstallDisplayName": "8BitBeatBox"
+    },
+    "portable": {
+      "artifactName": "8BitBeatBox-${version}-portable.exe"
+    }
+  }
+}
