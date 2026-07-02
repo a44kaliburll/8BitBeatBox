@@ -67,6 +67,7 @@
     var song = {
       title: 'Untitled Chiptune',
       bpm: 120,
+      era: '8',          // console era: '8' | '16' | '32' | '64'
       stepsPerBeat: 4,   // grid resolution (4 = sixteenth notes)
       beatsPerBar: 4,
       barsPerPattern: 2,
@@ -113,12 +114,27 @@
     return song.patterns.length - 1;
   }
 
+  // Songs saved before eras existed carry no era — infer the lowest era whose
+  // instrument groups cover every channel, so old saves sound as they did.
+  var GROUP_ERA = { NES: '8', Drums: '8', SNES: '16', PS1: '32', N64: '64' };
+  var ERA_ORDER = ['8', '16', '32', '64'];
+  function inferEra(channels) {
+    var best = 0;
+    (channels || []).forEach(function (c) {
+      var inst = global.BBB.Synth.INSTRUMENT_MAP[c.instId];
+      var e = inst ? (GROUP_ERA[inst.group] || '8') : '8';
+      best = Math.max(best, ERA_ORDER.indexOf(e));
+    });
+    return ERA_ORDER[best];
+  }
+
   // ---- Serialization -------------------------------------------------------
   function serialize(song) {
     return JSON.stringify({
       v: 1,
       title: song.title,
       bpm: song.bpm,
+      era: song.era,
       stepsPerBeat: song.stepsPerBeat,
       beatsPerBar: song.beatsPerBar,
       barsPerPattern: song.barsPerPattern,
@@ -137,6 +153,7 @@
     var song = {
       title: d.title || 'Untitled',
       bpm: d.bpm || 120,
+      era: d.era || inferEra(d.channels),
       stepsPerBeat: d.stepsPerBeat || 4,
       beatsPerBar: d.beatsPerBar || 4,
       barsPerPattern: d.barsPerPattern || 2,

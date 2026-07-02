@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>8BitBeatBox — NES / SNES Chiptune Maker</title>
+<title>8BitBeatBox — 8/16/32/64-bit Game Music Maker</title>
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,6 +17,12 @@
     <div class="transport">
       <button id="btn-play" class="btn primary">▶ Play</button>
       <button id="btn-stop" class="btn">■</button>
+      <div class="era-switch" id="era-switch" title="Console era — shapes the sound character &amp; instrument palette">
+        <button class="era-btn" data-era="8">8-BIT</button>
+        <button class="era-btn" data-era="16">16-BIT</button>
+        <button class="era-btn" data-era="32">32-BIT</button>
+        <button class="era-btn" data-era="64">64-BIT</button>
+      </div>
       <label class="ctl">Mode
         <select id="mode">
           <option value="pattern">Loop</option>
@@ -29,6 +35,7 @@
 
     <div class="file-ops">
       <input id="title" class="song-title" type="text" value="Untitled Chiptune" spellcheck="false">
+      <button id="btn-random" class="btn random" title="Generate a random song in the current era">🎲 Random</button>
       <button id="btn-undo" class="btn icon" title="Undo (Ctrl+Z)">↶</button>
       <button id="btn-redo" class="btn icon" title="Redo (Ctrl+Y)">↷</button>
       <button id="btn-save" class="btn ghost" title="Save to your song library">Save</button>
@@ -129,6 +136,8 @@
     <span><b style="color:var(--magenta)">Move:</b> drag a note · <b style="color:var(--magenta)">Length:</b> drag its right edge</span>
     <span class="sep">·</span>
     <span><b style="color:var(--gold)">Erase:</b> right-drag / alt-click</span>
+    <span class="sep">·</span>
+    <span><b style="color:var(--lime)">🎲 Random:</b> instant song in the current era</span>
     <span class="sep">·</span>
     <span><span class="kbd">Space</span> play <span class="kbd">Ctrl+Z</span> undo</span>
   </footer>
@@ -231,6 +240,7 @@
   <script src="js/library.js"></script>
   <script src="js/midi.js"></script>
   <script src="js/demo.js"></script>
+  <script src="js/generator.js"></script>
   <script src="js/sequencer.js"></script>
   <script src="js/pianoroll.js"></script>
   <script src="js/crusher.js"></script>

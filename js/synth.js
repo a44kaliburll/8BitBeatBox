@@ -103,6 +103,8 @@
     { id: 'clap', name: 'Clap', group: 'Drums', type: 'noise', noise: 'white', gain: 0.2, basePitch: 57, env: { a: 0.001, d: 0.06, s: 0.0, r: 0.05 } },
     { id: 'crash', name: 'Crash', group: 'Drums', type: 'noise', noise: 'white', gain: 0.13, basePitch: 60, env: { a: 0.001, d: 0.6, s: 0.0, r: 0.4 } },
     { id: 'noiseMetal', name: 'Metal Noise', group: 'Drums', type: 'noise', noise: 'metal', gain: 0.18, basePitch: 60, env: { a: 0.001, d: 0.1, s: 0.05, r: 0.06 } },
+    { id: 'ride', name: 'Ride', group: 'Drums', type: 'noise', noise: 'metal', gain: 0.12, basePitch: 72, env: { a: 0.001, d: 0.5, s: 0.0, r: 0.3 } },
+    { id: 'shaker', name: 'Shaker', group: 'Drums', type: 'noise', noise: 'white', gain: 0.12, basePitch: 78, env: { a: 0.01, d: 0.05, s: 0.0, r: 0.04 } },
     { id: 'laser', name: 'Laser FX', group: 'Drums', type: 'pulse', wave: 'pulse25', gain: 0.2, env: { a: 0.001, d: 0.3, s: 0.0, r: 0.05 }, sweep: { from: 3, to: 0.5, time: 0.28 } },
 
     // ===== SNES-style =====
@@ -127,14 +129,121 @@
     { id: 'choir', name: 'Choir', group: 'SNES', type: 'wave', wave: 'saw', gain: 0.12, env: { a: 0.18, d: 0.25, s: 0.85, r: 0.4 }, vib: { depth: 6, speed: 4.5, delay: 0.3 },
       stack: [{ wave: 'saw', detune: -5, gain: 0.6 }, { wave: 'triangle', detune: 5, gain: 0.7 }] },
     { id: 'pad', name: 'Warm Pad', group: 'SNES', type: 'wave', wave: 'triangle', gain: 0.14, env: { a: 0.2, d: 0.3, s: 0.85, r: 0.5 }, vib: { depth: 5, speed: 4, delay: 0.3 },
-      stack: [{ wave: 'triangle', detune: -6, gain: 0.8 }, { wave: 'saw', detune: 6, gain: 0.35 }] }
+      stack: [{ wave: 'triangle', detune: -6, gain: 0.8 }, { wave: 'saw', detune: 6, gain: 0.35 }] },
+
+    // ===== PS1 / 32-bit (FM bells, filtered digital leads, acid & sub bass) =====
+    { id: 'fmBell', name: 'FM Bell', group: 'PS1', type: 'sine', gain: 0.24, env: { a: 0.002, d: 0.7, s: 0.0, r: 0.5 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 3.5, gain: 0.28 }, { wave: 'sine', ratio: 7.02, gain: 0.1 }] },
+    { id: 'fmEPiano', name: 'FM E-Piano', group: 'PS1', type: 'sine', gain: 0.22, env: { a: 0.003, d: 0.45, s: 0.2, r: 0.25 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 2, detune: 5, gain: 0.3 }, { wave: 'sine', ratio: 6.98, gain: 0.08 }] },
+    { id: 'digiLead', name: 'Digital Lead', group: 'PS1', type: 'wave', wave: 'saw', gain: 0.15, env: { a: 0.006, d: 0.09, s: 0.75, r: 0.12 }, vib: { depth: 9, speed: 5.5, delay: 0.14 },
+      filter: { freq: 2400, q: 1.2, env: 3200, decay: 0.16 },
+      stack: [{ wave: 'saw', detune: -6, gain: 0.9 }, { wave: 'pulse25', detune: 7, gain: 0.65 }] },
+    { id: 'resoPluck', name: 'Reso Pluck', group: 'PS1', type: 'wave', wave: 'saw', gain: 0.24, env: { a: 0.002, d: 0.2, s: 0.0, r: 0.08 },
+      filter: { freq: 700, q: 5, env: 2800, decay: 0.14 } },
+    { id: 'acidBass', name: 'Acid Bass', group: 'PS1', type: 'wave', wave: 'saw', gain: 0.3, env: { a: 0.002, d: 0.16, s: 0.25, r: 0.06 },
+      filter: { freq: 320, q: 7, env: 1900, decay: 0.15 } },
+    { id: 'subBass', name: 'Sub Bass', group: 'PS1', type: 'sine', gain: 0.4, env: { a: 0.004, d: 0.06, s: 0.9, r: 0.07 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'triangle', ratio: 2, gain: 0.25 }] },
+    { id: 'dreamPad', name: 'Dream Pad', group: 'PS1', type: 'wave', wave: 'saw', gain: 0.11, env: { a: 0.3, d: 0.4, s: 0.85, r: 0.7 }, vib: { depth: 5, speed: 4.2, delay: 0.3 },
+      filter: { freq: 1500, q: 0.8 },
+      stack: [{ wave: 'saw', detune: -11, gain: 0.8 }, { wave: 'saw', detune: 11, gain: 0.8 }, { wave: 'pulse50', ratio: 0.5, gain: 0.4 }] },
+    { id: 'vibes', name: 'Vibraphone', group: 'PS1', type: 'sine', gain: 0.25, env: { a: 0.002, d: 0.9, s: 0.0, r: 0.5 }, vib: { depth: 10, speed: 4.5, delay: 0.05 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 4, gain: 0.18 }] },
+    { id: 'orchHit', name: 'Orch Hit', group: 'PS1', type: 'wave', wave: 'saw', gain: 0.2, env: { a: 0.004, d: 0.28, s: 0.0, r: 0.12 },
+      filter: { freq: 1200, q: 1, env: 2400, decay: 0.2 },
+      stack: [{ wave: 'saw', detune: -10, gain: 0.9 }, { wave: 'saw', detune: 10, gain: 0.9 }, { wave: 'saw', ratio: 0.5, gain: 0.7 }] },
+
+    // ===== N64 / 64-bit (lush, atmospheric, sampled-orchestra flavour) =====
+    { id: 'n64Strings', name: 'Hall Strings', group: 'N64', type: 'wave', wave: 'saw', gain: 0.11, env: { a: 0.16, d: 0.25, s: 0.85, r: 0.45 }, vib: { depth: 7, speed: 4.8, delay: 0.25 },
+      filter: { freq: 2600, q: 0.7 },
+      stack: [{ wave: 'saw', detune: -8, gain: 0.85 }, { wave: 'saw', detune: 8, gain: 0.85 }, { wave: 'saw', ratio: 2, detune: 4, gain: 0.25 }] },
+    { id: 'ambientPad', name: 'Ambient Pad', group: 'N64', type: 'wave', wave: 'triangle', gain: 0.13, env: { a: 0.45, d: 0.5, s: 0.9, r: 1.0 }, vib: { depth: 4, speed: 3.8, delay: 0.4 },
+      filter: { freq: 1600, q: 0.6 },
+      stack: [{ wave: 'triangle', detune: -9, gain: 0.9 }, { wave: 'saw', detune: 9, gain: 0.4 }, { wave: 'sine', ratio: 2, gain: 0.3 }] },
+    { id: 'rhodes', name: 'Rhodes Keys', group: 'N64', type: 'sine', gain: 0.23, env: { a: 0.004, d: 0.5, s: 0.3, r: 0.3 }, vib: { depth: 5, speed: 4.5, delay: 0.2 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 2, detune: 6, gain: 0.25 }, { wave: 'sine', ratio: 5, gain: 0.05 }] },
+    { id: 'musicBox', name: 'Music Box', group: 'N64', type: 'sine', gain: 0.24, env: { a: 0.002, d: 1.1, s: 0.0, r: 0.6 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 4, gain: 0.3 }, { wave: 'sine', ratio: 9.7, gain: 0.06 }] },
+    { id: 'pizzicato', name: 'Pizzicato', group: 'N64', type: 'triangle', wave: 'triangle', gain: 0.3, env: { a: 0.002, d: 0.14, s: 0.0, r: 0.06 },
+      filter: { freq: 900, q: 1.4, env: 1800, decay: 0.1 } },
+    { id: 'glideLead', name: 'Smooth Lead', group: 'N64', type: 'triangle', wave: 'triangle', gain: 0.26, env: { a: 0.02, d: 0.1, s: 0.8, r: 0.18 }, vib: { depth: 12, speed: 5.2, delay: 0.2 },
+      stack: [{ wave: 'triangle', ratio: 1, gain: 1 }, { wave: 'sine', ratio: 1, detune: 5, gain: 0.5 }] },
+    { id: 'dreamSquare', name: 'Dream Square', group: 'N64', type: 'pulse', wave: 'pulse50', gain: 0.14, env: { a: 0.03, d: 0.12, s: 0.8, r: 0.25 }, vib: { depth: 7, speed: 4.6, delay: 0.2 },
+      filter: { freq: 3200, q: 0.8 },
+      stack: [{ wave: 'pulse50', detune: -6, gain: 0.85 }, { wave: 'pulse50', detune: 6, gain: 0.85 }] },
+    { id: 'deepBass', name: 'Deep Bass', group: 'N64', type: 'sine', gain: 0.42, env: { a: 0.005, d: 0.1, s: 0.85, r: 0.1 },
+      stack: [{ wave: 'sine', ratio: 1, gain: 1 }, { wave: 'triangle', ratio: 1, gain: 0.35 }, { wave: 'sine', ratio: 2, gain: 0.15 }] }
   ];
 
   var INSTRUMENT_MAP = {};
   INSTRUMENTS.forEach(function (i) { INSTRUMENT_MAP[i.id] = i; });
 
-  // Group order for menus.
-  var GROUPS = ['NES', 'Drums', 'SNES'];
+  // Group order for menus, with friendly labels.
+  var GROUPS = ['NES', 'Drums', 'SNES', 'PS1', 'N64'];
+  var GROUP_LABELS = {
+    NES: 'NES · 8-bit', Drums: 'Drums & FX', SNES: 'SNES · 16-bit',
+    PS1: 'PS1 · 32-bit', N64: 'N64 · 64-bit'
+  };
+
+  // ---- Console eras ---------------------------------------------------------
+  // Each era shapes the master output (bit quantize, tone filter, reverb) and
+  // gates which instrument groups appear in menus.
+  var ERAS = {
+    '8': { name: '8-BIT', desc: 'NES · crunchy pulse waves', bits: 8, lp: 10500, reverb: 0, groups: ['NES', 'Drums'] },
+    '16': { name: '16-BIT', desc: 'SNES · warm sample-synth', bits: 12, lp: 15500, reverb: 0.12, groups: ['NES', 'Drums', 'SNES'] },
+    '32': { name: '32-BIT', desc: 'PS1 · clean digital', bits: 0, lp: 18500, reverb: 0.18, groups: ['NES', 'Drums', 'SNES', 'PS1'] },
+    '64': { name: '64-BIT', desc: 'N64 · lush & spacious', bits: 0, lp: 0, reverb: 0.28, groups: ['NES', 'Drums', 'SNES', 'PS1', 'N64'] }
+  };
+  var ERA_ORDER = ['8', '16', '32', '64'];
+
+  function makeCrushCurve(bits) {
+    var n = 4096, curve = new Float32Array(n);
+    var levels = Math.pow(2, bits - 1);
+    for (var i = 0; i < n; i++) {
+      var x = (i / (n - 1)) * 2 - 1;
+      curve[i] = Math.round(x * levels) / levels;
+    }
+    return curve;
+  }
+
+  function buildImpulse(ctx, seconds, decay) {
+    var rate = ctx.sampleRate, len = Math.max(1, Math.floor(rate * seconds));
+    var buf = ctx.createBuffer(2, len, rate);
+    for (var c = 0; c < 2; c++) {
+      var d = buf.getChannelData(c);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+    }
+    return buf;
+  }
+
+  // Master FX chain for an era: input → [bit quantize] → [tone LP] → dry+reverb → out.
+  // Used for both live playback and offline WAV rendering.
+  function createMasterChain(ctx, eraKey) {
+    var era = ERAS[eraKey] || ERAS['8'];
+    var input = ctx.createGain();
+    var node = input;
+    if (era.bits) {
+      var shaper = ctx.createWaveShaper();
+      shaper.curve = makeCrushCurve(era.bits);
+      node.connect(shaper); node = shaper;
+    }
+    if (era.lp) {
+      var lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = era.lp; lp.Q.value = 0.5;
+      node.connect(lp); node = lp;
+    }
+    var out = ctx.createGain();
+    node.connect(out);
+    if (era.reverb > 0) {
+      var conv = ctx.createConvolver();
+      conv.buffer = buildImpulse(ctx, eraKey === '64' ? 2.4 : 1.7, 3);
+      var wet = ctx.createGain(); wet.gain.value = era.reverb;
+      node.connect(conv); conv.connect(wet); wet.connect(out);
+    }
+    out.connect(ctx.destination);
+    return { input: input, output: out };
+  }
 
   // ---- Voice construction --------------------------------------------------
   function createVoice(ctx, inst, opts) {
@@ -164,6 +273,23 @@
     var stopTime = relEnd + 0.02;
     var freq = opts.freq;
 
+    // Optional per-voice lowpass with a velocity-scaled envelope (acid/reso sounds).
+    var target = amp;
+    if (inst.filter) {
+      var flt = ctx.createBiquadFilter();
+      flt.type = inst.filter.type || 'lowpass';
+      var f0 = inst.filter.freq;
+      if (inst.filter.env) {
+        flt.frequency.setValueAtTime(Math.min(18000, f0 + inst.filter.env * vel), t0);
+        flt.frequency.exponentialRampToValueAtTime(Math.max(40, f0), t0 + (inst.filter.decay || 0.2));
+      } else {
+        flt.frequency.value = f0;
+      }
+      flt.Q.value = inst.filter.q || 0.7;
+      flt.connect(amp);
+      target = flt;
+    }
+
     function makeOsc(wave, f, detuneCents, gainMul) {
       var osc = ctx.createOscillator();
       if (wave === 'sine') osc.type = 'sine';
@@ -192,7 +318,7 @@
         var g = ctx.createGain(); g.gain.value = gainMul;
         osc.connect(g); out = g;
       }
-      out.connect(amp);
+      out.connect(target);
       osc.start(t0); osc.stop(stopTime);
     }
 
@@ -202,7 +328,7 @@
       src.loop = true;
       var ratio = Math.pow(2, (opts.midi - (inst.basePitch || 60)) / 12);
       src.playbackRate.value = Math.max(0.25, Math.min(4, ratio));
-      src.connect(amp);
+      src.connect(target);
       src.start(t0); src.stop(stopTime);
     } else if (inst.type === 'kick') {
       var d = inst.drop || { from: 2.2, to: 0.6, time: 0.09 };
@@ -210,7 +336,7 @@
       osc.setPeriodicWave(assets.waves.triangle);
       osc.frequency.setValueAtTime(Math.max(40, freq * d.from), t0);
       osc.frequency.exponentialRampToValueAtTime(Math.max(28, freq * d.to), t0 + d.time);
-      osc.connect(amp);
+      osc.connect(target);
       osc.start(t0); osc.stop(stopTime);
     } else {
       // tonal: pulse / triangle / wave / sine, optionally a multi-osc stack
@@ -230,9 +356,11 @@
 
   // ---- Live engine ---------------------------------------------------------
   var Synth = {
-    ctx: null, master: null,
+    ctx: null, master: null, era: '8', _chain: null,
     INSTRUMENTS: INSTRUMENTS, INSTRUMENT_MAP: INSTRUMENT_MAP, GROUPS: GROUPS,
+    GROUP_LABELS: GROUP_LABELS, ERAS: ERAS, ERA_ORDER: ERA_ORDER,
     midiToFreq: midiToFreq, createVoice: createVoice, getAssets: getAssets,
+    createMasterChain: createMasterChain,
 
     ensure: function () {
       if (!this.ctx) {
@@ -240,11 +368,24 @@
         this.ctx = new AC();
         this.master = this.ctx.createGain();
         this.master.gain.value = 0.8;
-        this.master.connect(this.ctx.destination);
+        this._chain = createMasterChain(this.ctx, this.era);
+        this.master.connect(this._chain.input);
       }
       if (this.ctx.state === 'suspended') this.ctx.resume();
       return this.ctx;
     },
+    setEra: function (key) {
+      if (!ERAS[key]) key = '8';
+      if (this.era === key && this._chain) return;
+      this.era = key;
+      if (this.ctx) {
+        this.master.disconnect();
+        if (this._chain) this._chain.output.disconnect();
+        this._chain = createMasterChain(this.ctx, key);
+        this.master.connect(this._chain.input);
+      }
+    },
+    groupsForEra: function (key) { return (ERAS[key] || ERAS['8']).groups; },
     setMasterVolume: function (v) { if (this.master) this.master.gain.value = v; },
     preview: function (instId, midi, dur) {
       this.ensure();

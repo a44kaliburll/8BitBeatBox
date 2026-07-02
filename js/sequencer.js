@@ -142,15 +142,17 @@
       var stepsPer = Song.patternSteps(song);
       var totalSteps = stepsPer * seqList.length;
       var sps = secondsPerStep(song);
-      var tail = 1.0; // seconds of release tail
+      var era = Synth.ERAS[song.era] || Synth.ERAS['8'];
+      var tail = era.reverb > 0 ? 2.6 : 1.0; // release + reverb tail
       var duration = totalSteps * sps + tail;
       var sampleRate = 44100;
 
       var OAC = global.OfflineAudioContext || global.webkitOfflineAudioContext;
       var octx = new OAC(2, Math.ceil(duration * sampleRate), sampleRate);
+      var chain = Synth.createMasterChain(octx, song.era);
       var master = octx.createGain();
       master.gain.value = (Synth.master ? Synth.master.gain.value : 0.8);
-      master.connect(octx.destination);
+      master.connect(chain.input);
 
       var audible = audibleChannels(song);
       for (var s = 0; s < seqList.length; s++) {

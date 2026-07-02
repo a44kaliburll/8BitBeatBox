@@ -16,13 +16,16 @@
     return e;
   }
 
-  function instrumentSelect(currentId) {
+  function instrumentSelect(currentId, era) {
     var sel = el('select', 'inst-select');
+    var allowed = Synth.groupsForEra(era);
     var groups = {};
     Synth.INSTRUMENTS.forEach(function (inst) {
+      // Hide instruments from later eras, but never hide the one in use.
+      if (allowed.indexOf(inst.group) === -1 && inst.id !== currentId) return;
       if (!groups[inst.group]) {
         var og = el('optgroup');
-        og.label = inst.group;
+        og.label = Synth.GROUP_LABELS[inst.group] || inst.group;
         groups[inst.group] = og;
         sel.appendChild(og);
       }
@@ -65,7 +68,7 @@
         nameIn.addEventListener('change', function () { ch.name = nameIn.value; app.onEdit(); });
         info.appendChild(nameIn);
 
-        var sel = instrumentSelect(ch.instId);
+        var sel = instrumentSelect(ch.instId, song.era);
         sel.addEventListener('change', function () {
           ch.instId = sel.value;
           var inst = Synth.INSTRUMENT_MAP[sel.value];

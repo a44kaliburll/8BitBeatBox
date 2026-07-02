@@ -1,8 +1,16 @@
 # 8BitBeatBox
 
-A comprehensive **NES / SNES-era chiptune maker** in the spirit of BeepBox and
-Bosca Ceoil — but every sound is synthesized to match the real 8-bit/16-bit
-console sound chips.
+A comprehensive **8/16/32/64-bit game-music maker** in the spirit of BeepBox and
+Bosca Ceoil — every sound is synthesized to match a console era, from crunchy
+NES pulse waves to lush N64-style pads.
+
+- **Console eras** — switch between **8-BIT (NES)**, **16-BIT (SNES)**,
+  **32-BIT (PS1)** and **64-BIT (N64)**. The era shapes the master sound
+  (bit quantizing, tone filtering, reverb) and unlocks era-appropriate
+  instrument banks.
+- **🎲 Random song generator** — one click writes a complete editable song
+  (chords, melody, bass, drums, arrangement, even a title) styled to the
+  current era, and starts playing it.
 
 ## Run it
 
@@ -28,17 +36,24 @@ The app is wrapped with [Electron](https://www.electronjs.org/) and packaged by
 
 ## The sound engine (authentic chip emulation)
 
-The synth recreates the **NES APU (2A03)** voice types plus a roster of
-SNES-style timbres — **35 instruments** in three groups:
+The synth recreates the **NES APU (2A03)** voice types plus SNES, PS1 and
+N64-style timbres — **54 instruments** in five era banks:
 
 | Group | Instruments |
 |-------|-------------|
-| **NES** | Pulse 12.5% / 25% / 50%, Pulse Lead, Pulse Pluck, Pulse Soft, PWM Lead, Square Stab, Chip Organ, Triangle Bass, Triangle Lead, Triangle Pluck, Octave Bass |
-| **Drums / FX** | Kick, Tom, Snare, Closed Hat, Open Hat, Clap, Crash, Metal Noise, Laser FX |
-| **SNES-style** | Saw Lead, Fat Saw, Super Saw, Strings, Brass, Flute, Soft Bell, Glass Bell, Electric Piano, Marimba, Organ, Choir, Warm Pad |
+| **NES · 8-bit** | Pulse 12.5% / 25% / 50%, Pulse Lead, Pulse Pluck, Pulse Soft, PWM Lead, Square Stab, Chip Organ, Triangle Bass, Triangle Lead, Triangle Pluck, Octave Bass |
+| **Drums / FX** | Kick, Tom, Snare, Closed Hat, Open Hat, Clap, Crash, Metal Noise, Ride, Shaker, Laser FX |
+| **SNES · 16-bit** | Saw Lead, Fat Saw, Super Saw, Strings, Brass, Flute, Soft Bell, Glass Bell, Electric Piano, Marimba, Organ, Choir, Warm Pad |
+| **PS1 · 32-bit** | FM Bell, FM E-Piano, Digital Lead, Reso Pluck, Acid Bass, Sub Bass, Dream Pad, Vibraphone, Orch Hit |
+| **N64 · 64-bit** | Hall Strings, Ambient Pad, Rhodes Keys, Music Box, Pizzicato, Smooth Lead, Dream Square, Deep Bass |
 
 Richer voices are built from stacked, detuned and octave-doubled oscillators;
-the Kick/Tom use pitch-drop sweeps and the Laser FX a glide.
+the Kick/Tom use pitch-drop sweeps, the Laser FX a glide, and the 32/64-bit
+banks add resonant filter envelopes (acid bass, reso plucks, filtered pads).
+
+**Era master chain:** the selected era colors the whole mix — 8-BIT adds bit
+quantizing and a dark lowpass like a real console's DAC, 16-BIT is warmer with
+a touch of reverb, 32/64-BIT are clean and spacious with hall reverb.
 
 - **Pulse waves** are built from true Fourier coefficients for each duty cycle —
   12.5%/25% give the classic "thin" NES lead; 50% is the full square.
@@ -72,6 +87,12 @@ the Kick/Tom use pitch-drop sweeps and the Laser FX a glide.
   set **Mode → Play Song**.
 
 **Transport & global**
+- **Console era** — the 8/16/32/64-BIT switch in the top bar. Instrument menus
+  show the banks available in that era (a channel already using a later-era
+  instrument keeps it).
+- **🎲 Random** — generates a complete song in the current era and plays it.
+  Don't like it? Click again. Like most of it? Edit any note — it's a normal
+  song. **Undo** brings the previous song back.
 - **Play / Stop** (or press **Spacebar**), **BPM**, master **Vol**.
 - **Grid** (note resolution), **Beats** per bar, **Bars** per pattern, **Zoom**.
 - **Undo / Redo** (↶ ↷ or **Ctrl+Z / Ctrl+Y**).
@@ -119,12 +140,13 @@ index.html          markup + control IDs
 css/style.css        neon retro UI
 css/fonts.css        bundled fonts (Press Start 2P, VT323) — fully offline
 css/fonts/           the .ttf files
-js/synth.js          NES/SNES synthesis + 35-instrument palette
-js/song.js           data model (song, channels, patterns, scales)
+js/synth.js          era-based synthesis + 54-instrument palette + master FX
+js/song.js           data model (song, era, channels, patterns, scales)
 js/library.js        in-browser saved-song library (localStorage)
 js/midi.js           Standard MIDI File parser + .mid → chiptune converter
 js/crusher.js        8-bit/16-bit audio FX (bitcrush WAV/MP3, presets, export)
 js/demo.js           the five built-in demo songs
+js/generator.js      🎲 random song generator (archetypes, melody, drums)
 js/sequencer.js      lookahead playback scheduler + clock playhead + WAV export
 js/pianoroll.js      canvas piano-roll editor (offscreen layer + paint mode)
 js/ui.js             channel rack / pattern / arrangement UI

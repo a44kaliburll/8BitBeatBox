@@ -137,6 +137,17 @@
       on('btn-undo', 'click', function () { self.undo(); });
       on('btn-redo', 'click', function () { self.redo(); });
 
+      // Console era switch — recolors the master sound & instrument menus.
+      Array.prototype.forEach.call(document.querySelectorAll('.era-btn'), function (btn) {
+        btn.addEventListener('click', function () { self.setEra(btn.getAttribute('data-era')); });
+      });
+
+      // Random song generator — builds a song in the current era and plays it.
+      on('btn-random', 'click', function () {
+        var song = global.BBB.Generator.generate(self.song.era);
+        if (self.loadSongChecked(song) && !Sequencer.isPlaying) self._togglePlay();
+      });
+
       on('btn-add-pattern', 'click', function () { self.setPattern(Song.addPattern(self.song)); UI.renderSequence(); self.onEdit(); });
       on('btn-dup-pattern', 'click', function () { self.setPattern(Song.addPattern(self.song, self.currentPatternIndex)); UI.renderSequence(); self.onEdit(); });
       on('btn-clear-pattern', 'click', function () {
@@ -179,10 +190,26 @@
 
     // Load a song after a replace-confirmation, and close the browser.
     loadSongChecked: function (song) {
-      if (!song) return;
-      if (!this._confirmReplace()) return;
+      if (!song) return false;
+      if (!this._confirmReplace()) return false;
       this._loadSong(song);
       UI.closeLibrary();
+      return true;
+    },
+
+    setEra: function (era) {
+      if (!Synth.ERAS[era]) return;
+      this.song.era = era;
+      Synth.setEra(era);
+      this._syncEraButtons();
+      UI.renderChannels(); // instrument menus follow the era
+      this.onEdit();
+    },
+    _syncEraButtons: function () {
+      var era = this.song.era;
+      Array.prototype.forEach.call(document.querySelectorAll('.era-btn'), function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-era') === era);
+      });
     },
 
     _saveToLibrary: function () {
@@ -307,6 +334,8 @@
       set('key', song.rootPc); set('scale', song.scale); set('mode', this.playMode);
       set('notelen', this.noteLen);
       var snap = document.getElementById('snap'); if (snap) snap.checked = this.snapToScale;
+      Synth.setEra(song.era);
+      this._syncEraButtons();
     },
 
     _togglePlay: function () {
